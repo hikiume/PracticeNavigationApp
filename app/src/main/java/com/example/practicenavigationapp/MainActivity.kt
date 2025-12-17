@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -41,11 +42,13 @@ fun AppNavHost() {
     ) {
         composable("home") {
             HomeScreen(
-                onNext = { navController.navigate("detail") }
+                onNext = { itemId -> navController.navigate("detail/$itemId") }
             )
         }
-        composable("detail") {
+        composable("detail/{itemId}") { backStackEntry ->
+            val itemId = backStackEntry.arguments?.getString("itemId")
             DetailScreen(
+                itemId = itemId ?: "No ID",
                 onBack = { navController.popBackStack() }
             )
         }
@@ -53,16 +56,19 @@ fun AppNavHost() {
 }
 
 @Composable
-fun HomeScreen(onNext: () -> Unit) {
-    Button(onClick = onNext) {
+fun HomeScreen(onNext: (String) -> Unit) {
+    Button(onClick = { onNext("Coffee") }) {
         Text("次へ")
     }
 }
 
 @Composable
-fun DetailScreen(onBack: () -> Unit) {
-    Button(onClick = onBack) {
-        Text("戻る")
+fun DetailScreen(itemId: String, onBack: () -> Unit) {
+    Column {
+        Text(itemId)
+        Button(onClick = onBack) {
+            Text("戻る")
+        }
     }
 }
 

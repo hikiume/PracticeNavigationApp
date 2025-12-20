@@ -16,7 +16,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.practicenavigationapp.ui.theme.PracticeNavigationAppTheme
+import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,17 +40,19 @@ fun AppNavHost() {
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = Home
     ) {
-        composable("home") {
+        composable<Home> {
             HomeScreen(
-                onNext = { itemId -> navController.navigate("detail/$itemId") }
+                onNext = { itemId ->
+                    navController.navigate(Detail(itemId = "Coffee"))
+                }
             )
         }
-        composable("detail/{itemId}") { backStackEntry ->
-            val itemId = backStackEntry.arguments?.getString("itemId")
+        composable<Detail> { backStackEntry ->
+            val detail = backStackEntry.toRoute<Detail>()
             DetailScreen(
-                itemId = itemId ?: "No ID",
+                itemId = detail.itemId,
                 onBack = { navController.popBackStack() }
             )
         }
@@ -71,4 +75,10 @@ fun DetailScreen(itemId: String, onBack: () -> Unit) {
         }
     }
 }
+
+@Serializable
+object Home
+
+@Serializable
+data class Detail(val itemId: String)
 
